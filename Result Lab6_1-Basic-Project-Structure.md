@@ -32,25 +32,36 @@
 
 3. **CMake Files** : บทบาทของไฟล์ CMakeLists.txt แต่ละไฟล์คืออะไร และทำงานอย่างไรใน Docker environment?
 
-   **ตอบ**
+
+
+    **ตอบ**
    CMakeLists.txt (root): กำหนด project หลัก (ชื่อ, chip target ฯลฯ) CMakeLists.txt (component): บอกว่าโค้ดใน component นี้มีไฟล์อะไร ต้อง link อะไร
    
    Docker env: ใช้ CMake/Ninja ใน container จัดการ build โดยอ่าน CMakeLists.txt ทุกระดับ แล้วรวม workflow เดียวกัน
    
    
-4. **Git Ignore** : ไฟล์ .gitignore มีความสำคัญอย่างไรสำหรับ ESP32 project development?
-   **ตอบ**
+5. **Git Ignore** : ไฟล์ .gitignore มีความสำคัญอย่างไรสำหรับ ESP32 project development?
+
+
+
+    **ตอบ**
    ป้องกันไม่ให้ไฟล์ที่ไม่จำเป็น (เช่น build/, .vscode/, binary, log) เข้าไปใน Git ทำให้ repo สะอาด sync กับทีมง่ายขึ้น
 
    
-5. **Container Persistence** : ข้อมูลใดบ้างที่จะหายไปเมื่อ restart container และข้อมูลใดที่จะอยู่ต่อ?
+7. **Container Persistence** : ข้อมูลใดบ้างที่จะหายไปเมื่อ restart container และข้อมูลใดที่จะอยู่ต่อ?
+
+
+
    **ตอบ**
     หายไปเพราะ ไฟล์ที่แก้ใน container แต่ไม่ได้ mount (เช่น build output, ไฟล์ใน /tmp)
 
     อยู่ต่อไฟล์ใน volume/host bind (projects/, source code) เพราะ map มาจากเครื่องหลัก
  
 
-7. **Development Workflow** : เปรียบเทียบ workflow การพัฒนาระหว่างการใช้ Docker กับการทำงานบน native system
+9. **Development Workflow** : เปรียบเทียบ workflow การพัฒนาระหว่างการใช้ Docker กับการทำงานบน native system
+
+
+
    **ตอบ**
    Docker: สภาพแวดล้อมเหมือนกันทุกที่ ลดปัญหา dependency ต้องเข้า container ตลอดเวลา
 
