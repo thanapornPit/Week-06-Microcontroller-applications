@@ -77,9 +77,8 @@
 ## ดูรายละเอียดขนาดตาม component
 
 
-
-Executing action: size-components
-Running ninja in directory /project/lab6_1_basic_build/build
+             Executing action: size-components
+             Running ninja in directory /project/lab6_1_basic_build/build
 Executing "ninja all"...
 [1/4] cd /project/lab6_1_basic_build/build && /opt/esp/python_env/idf6.0_py3.12_env/bin/python /opt/esp/idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /project/lab6_1_basic_build/build/partition_table/partition-table.bin /project/lab6_1_basic_build/build/lab6_1_basic_build.bin
 lab6_1_basic_build.bin binary size 0x27c00 bytes. Smallest app partition is 0x100000 bytes. 0xd8400 bytes (84%) free.
@@ -127,4 +126,3 @@ Executing "ninja size-components"...
 │ libnvs_sec_provider.a   │          5 │    0 │    0 │     0 │     0 │     0 │        0 │          5 │     5 │          0 │       0 │        0 │        0 │                  0 │           0 │
 │ libesp_phy.a            │          5 │    0 │    0 │     0 │     0 │     0 │        0 │          5 │     5 │          0 │       0 │        0 │        0 │                  0 │           0 │
 └─────────────────────────┴────────────┴──────┴──────┴───────┴───────┴───────┴──────────┴────────────┴───────┴────────────┴─────────┴──────────┴──────────┴────────────────────┴─────────────┘
-
