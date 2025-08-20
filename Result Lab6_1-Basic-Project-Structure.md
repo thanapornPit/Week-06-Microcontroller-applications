@@ -133,7 +133,7 @@
 
 ## ดูรายละเอียดขนาดตาม source file
 
-[size-files.txt](https://github.com/user-attachments/files/21877092/size-files.txt)
+                  [size-files.txt](https://github.com/user-attachments/files/21877092/size-files.txt)
                   Executing action: size-files
                   Running ninja in directory /project/lab6_1_basic_build/build
                   Executing "ninja all"...
