@@ -5,67 +5,7 @@
 
 
 
-## คำถามทบทวน
 
-1. **Docker vs Native Setup** : อธิบายข้อดีของการใช้ Docker เปรียบเทียบกับการติดตั้ง ESP-IDF บน host system
-   
-   **ตอบ**
-     - Docker: ติดตั้งง่าย ไม่ต้องยุ่งกับ dependency ของระบบหลัก แยกสภาพแวดล้อม ไม่ทำเครื่องรก ใช้งานข้ามเครื่อง/OS ได้เหมือนกันทุกที่
-
-     - Native: ยืดหยุ่นกว่า เข้าถึง resource ได้เต็ม แต่ต้องติดตั้ง package เอง มีโอกาส conflict และย้ายเครื่องยาก
-  
-2.  **Build Process** : อธิบายขั้นตอนการ build ของ ESP-IDF ใน Docker container ตั้งแต่ source code จนได้ binary
-
-    **ตอบ**
-    - Mount Volume  โฟลเดอร์โปรเจกต์จาก host ถูกแชร์เข้า container
-
-    - Execute Build Command  รัน idf.py build ใน container
-
-    - CMake Configuration  CMake อ่าน CMakeLists.txt สร้าง build script + ตรวจ dependencies
-
-    - Compilation  GCC คอมไพล์ source code → object files
-
-    - Linking  รวม object files + libraries → binary/firmware
-
-    - Output ไฟล์ .bin / .elf อยู่ในโฟลเดอร์ build/ และ sync กลับไปที่ host
-
-
-3. **CMake Files** : บทบาทของไฟล์ CMakeLists.txt แต่ละไฟล์คืออะไร และทำงานอย่างไรใน Docker environment?
-
-
-
-    **ตอบ**
-   CMakeLists.txt (root): กำหนด project หลัก (ชื่อ, chip target ฯลฯ) CMakeLists.txt (component): บอกว่าโค้ดใน component นี้มีไฟล์อะไร ต้อง link อะไร
-   
-   Docker env: ใช้ CMake/Ninja ใน container จัดการ build โดยอ่าน CMakeLists.txt ทุกระดับ แล้วรวม workflow เดียวกัน
-   
-   
-5. **Git Ignore** : ไฟล์ .gitignore มีความสำคัญอย่างไรสำหรับ ESP32 project development?
-
-
-
-    **ตอบ**
-   ป้องกันไม่ให้ไฟล์ที่ไม่จำเป็น (เช่น build/, .vscode/, binary, log) เข้าไปใน Git ทำให้ repo สะอาด sync กับทีมง่ายขึ้น
-
-   
-7. **Container Persistence** : ข้อมูลใดบ้างที่จะหายไปเมื่อ restart container และข้อมูลใดที่จะอยู่ต่อ?
-
-
-
-   **ตอบ**
-    หายไปเพราะ ไฟล์ที่แก้ใน container แต่ไม่ได้ mount (เช่น build output, ไฟล์ใน /tmp)
-
-    อยู่ต่อไฟล์ใน volume/host bind (projects/, source code) เพราะ map มาจากเครื่องหลัก
- 
-
-9. **Development Workflow** : เปรียบเทียบ workflow การพัฒนาระหว่างการใช้ Docker กับการทำงานบน native system
-
-
-
-   **ตอบ**
-   Docker: สภาพแวดล้อมเหมือนกันทุกที่ ลดปัญหา dependency ต้องเข้า container ตลอดเวลา
-
-   Native: สะดวก ใช้งานตรงบนเครื่อง เสี่ยง dependency พัง ย้ายเครื่องยาก
 
 
 
@@ -347,5 +287,185 @@
                   │ log_write.c.obj                     │          4 │    4 │    0 │     4 │    0 │     0 │        0 │          0 │     0 │          0 │       0 │        0 │        0 │                  0 │           0 │
                   │ spi_bus_lock.c.obj                  │          4 │    0 │    0 │     0 │    0 │     0 │        0 │          0 │     0 │          4 │       4 │        0 │        0 │                  0 │           0 │
                   └─────────────────────────────────────┴────────────┴──────┴──────┴───────┴──────┴───────┴──────────┴────────────┴───────┴────────────┴─────────┴──────────┴──────────┴────────────────────┴─────────────┘
+
+
+
+
+
+## การทดลองเพิ่มเติม
+### 1.เพิ่ม Build Information (ใน Docker Container)
+
+
+
+
+
+
+                  Adding SPI flash device
+                  ets Jul 29 2019 12:21:46
+                  
+                  rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+                  configsip: 0, SPIWP:0xee
+                  clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+                  mode:DIO, clock div:2
+                  load:0x3fff0030,len:6372
+                  load:0x40078000,len:15920
+                  ho 0 tail 12 room 4
+                  load:0x40080400,len:3880
+                  entry 0x40080638
+                  I (1097) boot: ESP-IDF v6.0-dev-1489-g4e036983a7 2nd stage bootloader
+                  I (1099) boot: compile time Aug 11 2025 16:05:01
+                  I (1100) boot: Multicore bootloader
+                  I (1635) boot: chip revision: v3.0
+                  I (1638) boot.esp32: SPI Speed      : 40MHz
+                  I (1639) boot.esp32: SPI Mode       : DIO
+                  I (1639) boot.esp32: SPI Flash Size : 2MB
+                  I (1709) boot: Enabling RNG early entropy source...
+                  I (1776) boot: Partition Table:
+                  I (1777) boot: ## Label            Usage          Type ST Offset   Length
+                  I (1778) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+                  I (1779) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+                  I (1780) boot:  2 factory          factory app      00 00 00010000 00100000
+                  I (1850) boot: End of partition table
+                  I (2395) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=09684h ( 38532) map
+                  I (2683) esp_image: segment 1: paddr=000196ac vaddr=3ffb0000 size=025e4h (  9700) load
+                  I (2954) esp_image: segment 2: paddr=0001bc98 vaddr=40080000 size=04380h ( 17280) load
+                  I (3236) esp_image: segment 3: paddr=00020020 vaddr=400d0020 size=0ef68h ( 61288) map
+                  I (3525) esp_image: segment 4: paddr=0002ef90 vaddr=40084380 size=08c14h ( 35860) load
+                  I (3797) esp_image: segment 5: paddr=00037bac vaddr=50000000 size=00024h (    36) load
+                  I (4810) boot: Loaded app from partition at offset 0x10000
+                  I (4811) boot: Disabling RNG early entropy source...
+                  I (4899) cpu_start: Multicore app
+                  I (9288) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+                  I (9293) cpu_start: Pro cpu start user code
+                  I (9294) cpu_start: cpu freq: 160000000 Hz
+                  I (9295) app_init: Application information:
+                  I (9296) app_init: Project name:     lab1_basic_build
+                  I (9297) app_init: App version:      1
+                  I (9297) app_init: Compile time:     Aug 11 2025 16:04:37
+                  I (9298) app_init: ELF file SHA256:  38fb5a065...
+                  I (9299) app_init: ESP-IDF:          v6.0-dev-1489-g4e036983a7
+                  I (9300) efuse_init: Min chip rev:     v0.0
+                  I (9301) efuse_init: Max chip rev:     v3.99
+                  I (9301) efuse_init: Chip rev:         v3.0
+                  I (9304) heap_init: Initializing. RAM available for dynamic allocation:
+                  I (9306) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+                  I (9308) heap_init: At 3FFB2EB0 len 0002D150 (180 KiB): DRAM
+                  I (9309) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+                  I (9310) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+                  I (9311) heap_init: At 4008CF94 len 0001306C (76 KiB): IRAM
+                  I (9373) spi_flash: detected chip: winbond
+                  I (9386) spi_flash: flash io: dio
+                  I (9403) main_task: Started on CPU0
+                  I (9413) main_task: Calling app_main()
+                  I (9413) LAB6_1: Lab 6.1: Basic ESP32 Project Structure
+                  I (9413) LAB6_1: ESP-IDF Version: v6.0-dev-1489-g4e036983a7
+                  I (9423) LAB6_1: Free heap size: 304628 bytes
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## คำถามทบทวน
+
+1. **Docker vs Native Setup** : อธิบายข้อดีของการใช้ Docker เปรียบเทียบกับการติดตั้ง ESP-IDF บน host system
+   
+   **ตอบ**
+     - Docker: ติดตั้งง่าย ไม่ต้องยุ่งกับ dependency ของระบบหลัก แยกสภาพแวดล้อม ไม่ทำเครื่องรก ใช้งานข้ามเครื่อง/OS ได้เหมือนกันทุกที่
+
+     - Native: ยืดหยุ่นกว่า เข้าถึง resource ได้เต็ม แต่ต้องติดตั้ง package เอง มีโอกาส conflict และย้ายเครื่องยาก
+  
+2.  **Build Process** : อธิบายขั้นตอนการ build ของ ESP-IDF ใน Docker container ตั้งแต่ source code จนได้ binary
+
+    **ตอบ**
+    - Mount Volume  โฟลเดอร์โปรเจกต์จาก host ถูกแชร์เข้า container
+
+    - Execute Build Command  รัน idf.py build ใน container
+
+    - CMake Configuration  CMake อ่าน CMakeLists.txt สร้าง build script + ตรวจ dependencies
+
+    - Compilation  GCC คอมไพล์ source code → object files
+
+    - Linking  รวม object files + libraries → binary/firmware
+
+    - Output ไฟล์ .bin / .elf อยู่ในโฟลเดอร์ build/ และ sync กลับไปที่ host
+
+
+3. **CMake Files** : บทบาทของไฟล์ CMakeLists.txt แต่ละไฟล์คืออะไร และทำงานอย่างไรใน Docker environment?
+
+
+
+    **ตอบ**
+   CMakeLists.txt (root): กำหนด project หลัก (ชื่อ, chip target ฯลฯ) CMakeLists.txt (component): บอกว่าโค้ดใน component นี้มีไฟล์อะไร ต้อง link อะไร
+   
+   Docker env: ใช้ CMake/Ninja ใน container จัดการ build โดยอ่าน CMakeLists.txt ทุกระดับ แล้วรวม workflow เดียวกัน
+   
+   
+5. **Git Ignore** : ไฟล์ .gitignore มีความสำคัญอย่างไรสำหรับ ESP32 project development?
+
+
+
+    **ตอบ**
+   ป้องกันไม่ให้ไฟล์ที่ไม่จำเป็น (เช่น build/, .vscode/, binary, log) เข้าไปใน Git ทำให้ repo สะอาด sync กับทีมง่ายขึ้น
+
+   
+7. **Container Persistence** : ข้อมูลใดบ้างที่จะหายไปเมื่อ restart container และข้อมูลใดที่จะอยู่ต่อ?
+
+
+
+   **ตอบ**
+    หายไปเพราะ ไฟล์ที่แก้ใน container แต่ไม่ได้ mount (เช่น build output, ไฟล์ใน /tmp)
+
+    อยู่ต่อไฟล์ใน volume/host bind (projects/, source code) เพราะ map มาจากเครื่องหลัก
+ 
+
+9. **Development Workflow** : เปรียบเทียบ workflow การพัฒนาระหว่างการใช้ Docker กับการทำงานบน native system
+
+
+
+   **ตอบ**
+   Docker: สภาพแวดล้อมเหมือนกันทุกที่ ลดปัญหา dependency ต้องเข้า container ตลอดเวลา
+
+   Native: สะดวก ใช้งานตรงบนเครื่อง เสี่ยง dependency พัง ย้ายเครื่องยาก
+
 
 
