@@ -1,4 +1,4 @@
-# ทดสอบ Build และ Run
+# ทดสอบ Build และ Run 1
             root@e0a2c7e8dd44:/project/lab6_2_multiple_files# idf.py qemu
             Adding "qemu"'s dependency "all" to list of commands with default set of options.
             Executing action: all (aliases: build)
@@ -112,7 +112,7 @@
 
 
 
-# ทดสอบ Build และ Run
+# ทดสอบ Build และ Run 2
 
 
                 rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
